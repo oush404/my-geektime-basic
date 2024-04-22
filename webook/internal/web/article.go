@@ -1,7 +1,7 @@
 package web
 
 import (
-	"context"
+	"fmt"
 	"github.com/ecodeclub/ekit/slice"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/sync/errgroup"
@@ -273,15 +273,17 @@ func (h *ArticleHandler) PubDetail(ctx *gin.Context) {
 		intr domain.Interactive
 	)
 
-	eg.Go(func() error {
-		var er error
-		art, er = h.svc.GetPubById(ctx, id)
-		return er
-	})
-
 	uc := ctx.MustGet("user").(jwt.UserClaims)
 	eg.Go(func() error {
 		var er error
+		fmt.Println("h.svc.GetPubById=========================")
+		art, er = h.svc.GetPubById(ctx, id, uc.Uid)
+		return er
+	})
+
+	eg.Go(func() error {
+		var er error
+		fmt.Println("h.intrSvc.Get=========================")
 		intr, er = h.intrSvc.Get(ctx, h.biz, id, uc.Uid)
 		return er
 	})
@@ -300,18 +302,19 @@ func (h *ArticleHandler) PubDetail(ctx *gin.Context) {
 		return
 	}
 
-	go func() {
-		// 1. 如果你想摆脱原本主链路的超时控制，你就创建一个新的
-		// 2. 如果你不想，你就用 ctx
-		newCtx, cancel := context.WithTimeout(context.Background(), time.Second)
-		defer cancel()
-		er := h.intrSvc.IncrReadCnt(newCtx, h.biz, art.Id)
-		if er != nil {
-			h.l.Error("更新阅读数失败",
-				logger.Int64("aid", art.Id),
-				logger.Error(err))
-		}
-	}()
+	//已经在kafka中更新阅读数了
+	//go func() {
+	//	// 1. 如果你想摆脱原本主链路的超时控制，你就创建一个新的
+	//	// 2. 如果你不想，你就用 ctx
+	//	newCtx, cancel := context.WithTimeout(context.Background(), time.Second)
+	//	defer cancel()
+	//	er := h.intrSvc.IncrReadCnt(newCtx, h.biz, art.Id)
+	//	if er != nil {
+	//		h.l.Error("更新阅读数失败",
+	//			logger.Int64("aid", art.Id),
+	//			logger.Error(err))
+	//	}
+	//}()
 
 	ctx.JSON(http.StatusOK, Result{
 		Data: ArticleVo{

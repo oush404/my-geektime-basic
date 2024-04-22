@@ -128,7 +128,7 @@ func (h *UserHandler) LoginJWT(ctx *gin.Context) {
 			ctx.String(http.StatusOK, "系统错误")
 			return
 		}
-		ctx.String(http.StatusOK, "等了成功")
+		ctx.String(http.StatusOK, "登录成功")
 	case service.ErrInvalidUserOrPassword:
 		ctx.String(http.StatusOK, "用户名或者密码不对")
 	default:
