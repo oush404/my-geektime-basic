@@ -14,6 +14,17 @@ services:
       #      - 外部访问用 13316
       - 13316:3306
 
+  prometheus:
+    image: prom/prometheus:v2.47.2
+    volumes:
+      - ./prometheus.yaml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+  zipkin:
+    #    用的是不支持 Kafka 之类的简化版本
+    image: openzipkin/zipkin-slim:2.24
+    ports:
+      - '9411:9411'
   redis:
     image: "bitnami/redis:latest"
     restart: always
@@ -33,11 +44,14 @@ services:
   etcd:
     image: "bitnami/etcd:latest"
     restart: always
-    entrypoint:
-      - ALLOW_NON_AUTHENTICATION=yes
+    environment:
+      - ALLOW_NONE_AUTHENTICATION=yes
     ports:
       - "12379:2379"
-
+  grafana:
+    image: grafana/grafana-enterprise:10.2.0
+    ports:
+      - 3000:3000
   kafka:
     image: 'bitnami/kafka:3.6.0'
     ports:

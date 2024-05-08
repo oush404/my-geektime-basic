@@ -6,6 +6,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"gorm.io/gorm"
+	"my-geektime-basic/webook/interactive/repository/dao"
 	"time"
 )
 
@@ -13,9 +14,9 @@ func InitTables(db *gorm.DB) error {
 	return db.AutoMigrate(&User{},
 		&Article{},
 		&PublishedArticle{},
-		&Interactive{},
-		&UserLikeBiz{},
-		&UserCollectionBiz{},
+		&dao.Interactive{},
+		&dao.UserLikeBiz{},
+		&dao.UserCollectionBiz{},
 		&AsyncSms{})
 }
 

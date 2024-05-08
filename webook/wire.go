@@ -4,6 +4,10 @@ package main
 
 import (
 	"github.com/google/wire"
+	repository2 "my-geektime-basic/webook/interactive/repository"
+	cache2 "my-geektime-basic/webook/interactive/repository/cache"
+	dao2 "my-geektime-basic/webook/interactive/repository/dao"
+	service2 "my-geektime-basic/webook/interactive/service"
 	"my-geektime-basic/webook/internal/events/article"
 	"my-geektime-basic/webook/internal/repository"
 	"my-geektime-basic/webook/internal/repository/cache"
@@ -14,10 +18,16 @@ import (
 	"my-geektime-basic/webook/ioc"
 )
 
-var interactiveSvcSet = wire.NewSet(dao.NewGORMInteractiveDAO,
-	cache.NewInteractiveRedisCache,
-	repository.NewCachedInteractiveRepository,
-	service.NewInteractiveService,
+var interactiveSvcSet = wire.NewSet(dao2.NewGORMInteractiveDAO,
+	cache2.NewInteractiveRedisCache,
+	repository2.NewCachedInteractiveRepository,
+	service2.NewInteractiveService,
+)
+
+var rankingSvcSet = wire.NewSet(
+	cache.NewRankingRedisCache,
+	repository.NewCachedRankingRepository,
+	service.NewBatchRankingService,
 )
 
 func InitWebServer() *App {
@@ -25,16 +35,23 @@ func InitWebServer() *App {
 		// 第三方依赖
 		ioc.InitRedis, ioc.InitDB,
 		ioc.InitLogger,
+		ioc.InitEtcd,
 		ioc.InitSaramaClient,
 		ioc.InitSyncProducer,
+		ioc.InitRlockClient,
 		// DAO 部分
 		dao.NewUserDAO,
 		dao.NewArticleGORMDAO,
 
-		interactiveSvcSet,
+		//interactiveSvcSet,
+		//ioc.InitIntrClient,
+		ioc.InitIntrClientV1,
+		rankingSvcSet,
+		ioc.InitJobs,
+		ioc.InitRankingJob,
 
 		article.NewSaramaSyncProducer,
-		article.NewInteractiveReadEventConsumer,
+		//events.NewInteractiveReadEventConsumer,
 		ioc.InitConsumers,
 
 		// cache 部分

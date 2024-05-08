@@ -4,7 +4,6 @@ import (
 	"github.com/IBM/sarama"
 	"github.com/spf13/viper"
 	"my-geektime-basic/webook/internal/events"
-	"my-geektime-basic/webook/internal/events/article"
 )
 
 func InitSaramaClient() sarama.Client {
@@ -33,6 +32,6 @@ func InitSyncProducer(c sarama.Client) sarama.SyncProducer {
 	return p
 }
 
-func InitConsumers(c1 *article.InteractiveReadEventConsumer) []events.Consumer {
-	return []events.Consumer{c1}
+func InitConsumers() []events.Consumer {
+	return []events.Consumer{}
 }

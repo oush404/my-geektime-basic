@@ -5,7 +5,8 @@ import (
 	_ "embed"
 	"fmt"
 	"github.com/redis/go-redis/v9"
-	"my-geektime-basic/webook/internal/domain"
+	"my-geektime-basic/webook/interactive/domain"
+	"my-geektime-basic/webook/internal/repository/cache"
 	"strconv"
 	"time"
 )
@@ -59,7 +60,7 @@ func (i *InteractiveRedisCache) Get(ctx context.Context, biz string, id int64) (
 		return domain.Interactive{}, err
 	}
 	if len(res) == 0 {
-		return domain.Interactive{}, ErrKeyNotExist
+		return domain.Interactive{}, cache.ErrKeyNotExist
 	}
 	var intr domain.Interactive
 	// 这边是可以忽略错误的
